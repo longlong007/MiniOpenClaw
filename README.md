@@ -36,10 +36,17 @@ Copy `.env.example` to `.env` and fill in your keys:
 cp .env.example .env
 ```
 
-Minimum required:
+Minimum required (three choices, pick one or more):
 ```env
-ANTHROPIC_API_KEY=sk-ant-...   # or OPENAI_API_KEY
+ANTHROPIC_API_KEY=sk-ant-...   # Claude models
+OPENAI_API_KEY=sk-...          # GPT models
+DEEPSEEK_API_KEY=sk-...        # DeepSeek models (OpenAI-compatible API)
 ```
+
+Model auto-selection priority when no explicit model is set:
+- Only `DEEPSEEK_API_KEY` → `deepseek/deepseek-chat`
+- Only `OPENAI_API_KEY` → `openai/gpt-4o`
+- Otherwise → `anthropic/claude-opus-4-6`
 
 Optional for channels:
 ```env
@@ -102,9 +109,14 @@ Config file: `~/.openclaw/openclaw.json`
 ```json
 {
   "agent": {
-    "model": "anthropic/claude-opus-4-6",
-    "maxTokens": 8192,
-    "browserEnabled": false
+    "model": "deepseek/deepseek-chat",
+    "maxTokens": 4096,
+    "browserEnabled": false,
+    "apiKeys": {
+      "anthropic": "sk-ant-...",
+      "openai": "sk-...",
+      "deepseek": "sk-..."
+    }
   },
   "gateway": {
     "port": 18789,

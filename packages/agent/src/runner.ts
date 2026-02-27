@@ -2,6 +2,7 @@ import type { AgentRunner, AgentRunOptions } from "@mini-openclaw/gateway";
 import type { ModelAdapter, ModelMessage, ToolDefinition } from "./models/types.js";
 import { AnthropicAdapter } from "./models/anthropic.js";
 import { OpenAIAdapter } from "./models/openai.js";
+import { DeepSeekAdapter } from "./models/deepseek.js";
 import { BrowserTool, browserToolDefinition, type BrowserToolInput } from "./tools/browser.js";
 import { SkillsLoader } from "./skills-loader.js";
 import type { SessionStore } from "@mini-openclaw/gateway";
@@ -27,10 +28,23 @@ export class AgentRunnerImpl implements AgentRunner {
 
   private createAdapter(): ModelAdapter {
     const model = this.config.model ?? "";
-    if (model.startsWith("openai/") || (!model.includes("/") && process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY)) {
-      return new OpenAIAdapter();
-    }
-    return new AnthropicAdapter();
+    const keys = this.config.apiKeys ?? {};
+    const env = process.env;
+
+    // Resolve per-provider API keys: config.apiKeys first, then env vars as fallback
+    const anthropicKey = keys.anthropic ?? env.ANTHROPIC_API_KEY;
+    const openaiKey = keys.openai ?? env.OPENAI_API_KEY;
+    const deepseekKey = keys.deepseek ?? env.DEEPSEEK_API_KEY;
+
+    // Explicit provider prefix always wins
+    if (model.startsWith("deepseek/")) return new DeepSeekAdapter(deepseekKey);
+    if (model.startsWith("openai/")) return new OpenAIAdapter(openaiKey);
+    if (model.startsWith("anthropic/")) return new AnthropicAdapter(anthropicKey);
+
+    // No prefix — auto-detect from available API keys (priority: anthropic > openai > deepseek)
+    if (deepseekKey && !anthropicKey && !openaiKey) return new DeepSeekAdapter(deepseekKey);
+    if (openaiKey && !anthropicKey) return new OpenAIAdapter(openaiKey);
+    return new AnthropicAdapter(anthropicKey);
   }
 
   async run(options: AgentRunOptions): Promise<void> {

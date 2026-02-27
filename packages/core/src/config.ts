@@ -48,6 +48,14 @@ export const AgentConfigSchema = z.object({
   workspace: z.string().optional(),
   skillsDir: z.string().optional(),
   browserEnabled: z.boolean().default(false),
+  // Per-provider API keys (optional; env vars take priority)
+  apiKeys: z
+    .object({
+      anthropic: z.string().optional(),
+      openai: z.string().optional(),
+      deepseek: z.string().optional(),
+    })
+    .optional(),
 });
 
 export const ConfigSchema = z.object({
@@ -90,8 +98,15 @@ export function loadConfig(): Config {
   const env = process.env;
   const merged = deepMerge(raw as Record<string, unknown>, {
     agent: {
-      ...(env.ANTHROPIC_API_KEY || env.OPENAI_API_KEY
-        ? {}
+      // Surface API keys from env into config.agent.apiKeys so adapters can read them
+      apiKeys: {
+        ...(env.ANTHROPIC_API_KEY ? { anthropic: env.ANTHROPIC_API_KEY } : {}),
+        ...(env.OPENAI_API_KEY ? { openai: env.OPENAI_API_KEY } : {}),
+        ...(env.DEEPSEEK_API_KEY ? { deepseek: env.DEEPSEEK_API_KEY } : {}),
+      },
+      // Auto-select model when DEEPSEEK_API_KEY is present and no explicit model set
+      ...(env.DEEPSEEK_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY
+        ? { model: "deepseek/deepseek-chat" }
         : {}),
     },
     gateway: {
