@@ -1,0 +1,29 @@
+{
+  "name": "@mini-openclaw/channel-feishu",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "dev": "tsup src/index.ts --format esm --dts --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mini-openclaw/core": "workspace:*",
+    "@mini-openclaw/gateway": "workspace:*",
+    "@larksuiteoapi/node-sdk": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/express": "^4.17.21",
+    "tsup": "^8.2.0",
+    "typescript": "^5.5.0"
+  }
+}

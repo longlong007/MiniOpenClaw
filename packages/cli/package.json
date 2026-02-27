@@ -1,0 +1,30 @@
+{
+  "name": "@mini-openclaw/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "openclaw": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --clean",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@mini-openclaw/core": "workspace:*",
+    "@mini-openclaw/gateway": "workspace:*",
+    "@mini-openclaw/agent": "workspace:*",
+    "@mini-openclaw/channel-discord": "workspace:*",
+    "@mini-openclaw/channel-feishu": "workspace:*",
+    "commander": "^12.1.0",
+    "dotenv": "^16.4.0",
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "@types/ws": "^8.5.12",
+    "@types/node": "^22.0.0",
+    "tsup": "^8.2.0",
+    "typescript": "^5.5.0"
+  }
+}

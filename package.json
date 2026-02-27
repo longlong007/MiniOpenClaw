@@ -1,0 +1,21 @@
+{
+  "name": "mini-openclaw",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Mini personal AI assistant platform — the lobster way 🦞",
+  "scripts": {
+    "build": "pnpm -r build && pnpm build:ui",
+    "build:ui": "tsc -p ui/tsconfig.json",
+    "dev": "pnpm --filter @mini-openclaw/gateway dev",
+    "gateway": "node packages/cli/dist/index.js gateway",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.5.0",
+    "tsup": "^8.2.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
