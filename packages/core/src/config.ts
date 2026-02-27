@@ -54,6 +54,7 @@ export const AgentConfigSchema = z.object({
       anthropic: z.string().optional(),
       openai: z.string().optional(),
       deepseek: z.string().optional(),
+      zhipu: z.string().optional(),
     })
     .optional(),
 });
@@ -103,10 +104,14 @@ export function loadConfig(): Config {
         ...(env.ANTHROPIC_API_KEY ? { anthropic: env.ANTHROPIC_API_KEY } : {}),
         ...(env.OPENAI_API_KEY ? { openai: env.OPENAI_API_KEY } : {}),
         ...(env.DEEPSEEK_API_KEY ? { deepseek: env.DEEPSEEK_API_KEY } : {}),
+        ...(env.ZHIPU_API_KEY ? { zhipu: env.ZHIPU_API_KEY } : {}),
       },
-      // Auto-select model when DEEPSEEK_API_KEY is present and no explicit model set
-      ...(env.DEEPSEEK_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY
+      // Auto-select default model from the sole available API key
+      ...(env.DEEPSEEK_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY && !env.ZHIPU_API_KEY
         ? { model: "deepseek/deepseek-chat" }
+        : {}),
+      ...(env.ZHIPU_API_KEY && !env.ANTHROPIC_API_KEY && !env.OPENAI_API_KEY && !env.DEEPSEEK_API_KEY
+        ? { model: "zhipu/glm-4-flash" }
         : {}),
     },
     gateway: {

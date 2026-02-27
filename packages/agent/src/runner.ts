@@ -3,6 +3,7 @@ import type { ModelAdapter, ModelMessage, ToolDefinition } from "./models/types.
 import { AnthropicAdapter } from "./models/anthropic.js";
 import { OpenAIAdapter } from "./models/openai.js";
 import { DeepSeekAdapter } from "./models/deepseek.js";
+import { ZhipuAdapter } from "./models/zhipu.js";
 import { BrowserTool, browserToolDefinition, type BrowserToolInput } from "./tools/browser.js";
 import { SkillsLoader } from "./skills-loader.js";
 import type { SessionStore } from "@mini-openclaw/gateway";
@@ -35,15 +36,21 @@ export class AgentRunnerImpl implements AgentRunner {
     const anthropicKey = keys.anthropic ?? env.ANTHROPIC_API_KEY;
     const openaiKey = keys.openai ?? env.OPENAI_API_KEY;
     const deepseekKey = keys.deepseek ?? env.DEEPSEEK_API_KEY;
+    const zhipuKey = keys.zhipu ?? env.ZHIPU_API_KEY;
 
     // Explicit provider prefix always wins
     if (model.startsWith("deepseek/")) return new DeepSeekAdapter(deepseekKey);
     if (model.startsWith("openai/")) return new OpenAIAdapter(openaiKey);
     if (model.startsWith("anthropic/")) return new AnthropicAdapter(anthropicKey);
+    if (model.startsWith("zhipu/")) return new ZhipuAdapter(zhipuKey);
 
-    // No prefix — auto-detect from available API keys (priority: anthropic > openai > deepseek)
-    if (deepseekKey && !anthropicKey && !openaiKey) return new DeepSeekAdapter(deepseekKey);
-    if (openaiKey && !anthropicKey) return new OpenAIAdapter(openaiKey);
+    // No prefix — auto-detect from available API keys
+    // Priority: anthropic > openai > deepseek > zhipu
+    if (anthropicKey) return new AnthropicAdapter(anthropicKey);
+    if (openaiKey) return new OpenAIAdapter(openaiKey);
+    if (deepseekKey) return new DeepSeekAdapter(deepseekKey);
+    if (zhipuKey) return new ZhipuAdapter(zhipuKey);
+    // Fallback: stub will warn about missing key
     return new AnthropicAdapter(anthropicKey);
   }
 

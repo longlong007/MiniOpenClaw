@@ -36,17 +36,23 @@ Copy `.env.example` to `.env` and fill in your keys:
 cp .env.example .env
 ```
 
-Minimum required (three choices, pick one or more):
+Minimum required (pick one or more):
 ```env
 ANTHROPIC_API_KEY=sk-ant-...   # Claude models
 OPENAI_API_KEY=sk-...          # GPT models
-DEEPSEEK_API_KEY=sk-...        # DeepSeek models (OpenAI-compatible API)
+DEEPSEEK_API_KEY=sk-...        # DeepSeek models (OpenAI-compatible)
+ZHIPU_API_KEY=...              # 智谱 GLM models (OpenAI-compatible)
 ```
 
-Model auto-selection priority when no explicit model is set:
-- Only `DEEPSEEK_API_KEY` → `deepseek/deepseek-chat`
-- Only `OPENAI_API_KEY` → `openai/gpt-4o`
-- Otherwise → `anthropic/claude-opus-4-6`
+Model auto-selection priority (when no `model` prefix is set):
+`anthropic` > `openai` > `deepseek` > `zhipu`
+
+| Only key present | Default model |
+|---|---|
+| `ANTHROPIC_API_KEY` | `anthropic/claude-opus-4-6` |
+| `OPENAI_API_KEY` | `openai/gpt-4o` |
+| `DEEPSEEK_API_KEY` | `deepseek/deepseek-chat` |
+| `ZHIPU_API_KEY` | `zhipu/glm-4-flash` |
 
 Optional for channels:
 ```env
@@ -109,13 +115,14 @@ Config file: `~/.openclaw/openclaw.json`
 ```json
 {
   "agent": {
-    "model": "deepseek/deepseek-chat",
+    "model": "zhipu/glm-4-flash",
     "maxTokens": 4096,
     "browserEnabled": false,
     "apiKeys": {
       "anthropic": "sk-ant-...",
       "openai": "sk-...",
-      "deepseek": "sk-..."
+      "deepseek": "sk-...",
+      "zhipu": "..."
     }
   },
   "gateway": {
